@@ -26,13 +26,9 @@ import socketserver,os
 
 # try: curl -v -X GET http://127.0.0.1:8080/
 
-
-
-
 class MyWebServer(socketserver.BaseRequestHandler):
     
     def handle(self):
-
         self.data = self.request.recv(1024).strip()
         
         # Parsing data to get the request method and uri
@@ -41,12 +37,12 @@ class MyWebServer(socketserver.BaseRequestHandler):
         uri = data_list[1]
         method = data_list[0]
 
-        # Dictionary for status code
+        # Dictionary for status codes
         self.code = {
             "200": 'HTTP/1.1 200 OK\r\n',
             "301": "HTTP/1.1 301 Moved Permanently\r\n",
             "404": "HTTP/1.1 404 Not Found\r\n",
-            "405": "HTTP/1.1 405 Method Not Allowed"
+            "405": "HTTP/1.1 405 Method Not Allowed\r\n"
         }
         # Dictionary for content type
         self.content = {
@@ -84,13 +80,14 @@ class MyWebServer(socketserver.BaseRequestHandler):
         self.code404()
         return
 
+    
+    # Handling all the status codes
     def code404(self):
         self.request.sendall(bytearray("{code}".format(code=self.code["404"]),'utf-8'))
     def code200(self,uri,info):
         if uri == ".css":
             self.request.sendall(bytearray("{code}Content-Type: {content}".format(code=self.code["200"], content = self.content["css"]),'utf-8'))
             self.request.sendall(bytearray(info,'utf-8'))
-            
         else:
             self.request.sendall(bytearray("{code}Content-Type: {content}".format(code=self.code["200"], content = self.content["html"]),'utf-8'))
             self.request.sendall(bytearray(info,'utf-8'))
